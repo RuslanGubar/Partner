@@ -16,6 +16,11 @@ class AddEditPartnerForm(tk.Toplevel):
         self.geometry("600x450")
 
         self.type_id_map = {}
+        try:
+            self.icon_image = tk.PhotoImage(file="assets/icon.png")  
+            self.iconphoto(False, self.icon_image)
+        except tk.TclError as e:
+            print(f"Error loading icon: {e}")
 
         self.create_widgets()
         if self.partner_id:
@@ -34,7 +39,6 @@ class AddEditPartnerForm(tk.Toplevel):
                 name, type_id, rating, address_id, director, phone, mail, inn = partner_data
                 self.name_entry.insert(0, name)
 
-                # Reverse lookup typeName from typeID:
                 for type_name, type_id_from_map in self.type_id_map.items():
                     if type_id_from_map == type_id:
                         self.type_combo.set(type_name)
@@ -139,12 +143,10 @@ class AddEditPartnerForm(tk.Toplevel):
             mail = self.mail_entry.get()
             inn = self.inn_entry.get()
 
-            # Check if required fields are empty
             if not name or not director or not phone or not mail or not inn:
                 messagebox.showerror("Ошибка", "все поля обязательны для заполнения.")
                 return
 
-            # Check if Rating is negative
             if rating < 0:
                 messagebox.showerror("Ошибка", "Рейтинг не может быть отрицательным числом.")
                 return
@@ -175,7 +177,7 @@ class AddEditPartnerForm(tk.Toplevel):
             cur.execute(query, params)
             conn.commit()
             messagebox.showinfo("Success", "Partner data saved successfully.")
-            self.partner_module.load_partners()  # Refresh
+            self.partner_module.load_partners()  
             self.destroy()
 
         except psycopg2.Error as e:
